@@ -1,0 +1,27 @@
+#!/bin/bash
+
+BRANCH="$1"
+DIR="../$BRANCH"
+
+if [ -z "$BRANCH" ]; then
+    echo "❌ 請輸入分支名稱：git add-worktree <branch-name>"
+    exit 1
+fi
+
+git switch main 2>/dev/null || git checkout main
+
+mkdir -p "$DIR"
+
+if ! git show-ref --quiet refs/heads/$BRANCH; then
+    echo "🌱 建立新分支 '$BRANCH' 自 main"
+    git branch "$BRANCH" main
+else
+    echo "✅ 分支 '$BRANCH' 已存在"
+fi
+
+if [ -d "$DIR/.git" ]; then
+    echo "📂 Worktree '$DIR' 已存在"
+else
+    git worktree add "$DIR" "$BRANCH"
+    echo "🚀 Worktree 建立成功：$DIR"
+fi
